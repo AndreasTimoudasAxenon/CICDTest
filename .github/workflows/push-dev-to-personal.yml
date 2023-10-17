@@ -27,13 +27,17 @@ jobs:
           id: create_matrix
           run: |
               SECRETS_CONTEXT=$SECRETS_CONTEXT
-              SECRETS_MATRIX='['
+              SECRETS_MATRIX=""
               for secret in $(echo $SECRETS_CONTEXT | jq -r 'to_entries[] | select(.key | endswith("_PERSONAL")) | .key'); do
-                SECRETS_MATRIX="${SECRETS_MATRIX}\"${secret}\","
+                SECRETS_MATRIX="${SECRETS_MATRIX}${secret},"
               done
               SECRETS_MATRIX="${SECRETS_MATRIX%,}"
 
-              echo "::set-output name=secrets_matrix::[$SECRETS_MATRIX]"
+              echo "SECRETS_MATRIX=$SECRETS_MATRIX" >> $GITHUB_ENV
+          shell: bash
+        - name: Display matrix
+          run: |
+              echo "Matrix: $SECRETS_MATRIX"
           shell: bash
 
     deploy-branch-to-personal-orgs:
