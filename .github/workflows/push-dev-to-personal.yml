@@ -44,8 +44,8 @@ jobs:
         if: ${{ github.actor != 'dependabot[bot]' }}
         steps:
             - name: Use Secret
-            run: |
-              echo "Using secret ${{ matrix.secret }}: ${{ secrets.${{ matrix.secret }} }}"
+              run: |
+                  echo "Using secret ${{ matrix.secret }}: ${{ secrets.${{ matrix.secret }} }}"
             # Install Salesforce CLI
             - name: 'Install Salesforce CLI'
               run: |
