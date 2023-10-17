@@ -7,6 +7,9 @@ on:
       branches: [ dev ]
       paths:
         - 'force-app/**'
+
+env:
+    SECRETS_CONTEXT: ${{ toJson(secrets) }}
             
 
 # Jobs to be executed
@@ -23,17 +26,14 @@ jobs:
         - name: Create Secret Matrix
           id: create_matrix
           run: |
-              SECRETS=($(compgen -e | grep '_PERSONAL$' | sort))
-              SECRET_COUNT=${#SECRETS[@]}
-              echo "Found $SECRET_COUNT secrets"
-              
+              SECRETS_CONTEXT=$SECRETS_CONTEXT
               SECRETS_MATRIX='['
-              for ((i=0; i<$SECRET_COUNT; i++)); do
-                SECRETS_MATRIX+="\"${SECRETS[$i]\","
+              for secret in $(echo $SECRETS_CONTEXT | jq -r 'to_entries[] | select(.key | endswith("_PERSONAL")) | .key'); do
+                SECRETS_MATRIX="${SECRETS_MATRIX}\"${secret}\","
               done
-              SECRETS_MATRIX="${SECRETS_MATRIX%,}]"
-              
-              echo "::set-output name=secrets_matrix::$SECRETS_MATRIX"
+              SECRETS_MATRIX="${SECRETS_MATRIX%,}"
+
+              echo "::set-output name=secrets_matrix::[$SECRETS_MATRIX]"
           shell: bash
 
     deploy-branch-to-personal-orgs:
