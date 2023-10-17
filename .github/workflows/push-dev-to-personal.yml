@@ -40,9 +40,12 @@ jobs:
         needs: create_matrix
         runs-on: ubuntu-latest
         strategy:
-            matrix: ${{fromJson(needs.create_matrix.outputs.matrix)}}
+            matrix: ${{fromJson(needs.create_matrix.outputs.secrets_matrix)}}
         if: ${{ github.actor != 'dependabot[bot]' }}
         steps:
+            - name: Use Secret
+            run: |
+              echo "Using secret ${{ matrix.secret }}: ${{ secrets.${{ matrix.secret }} }}"
             # Install Salesforce CLI
             - name: 'Install Salesforce CLI'
               run: |
